@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>bibliotecas</name>
+			<type>2</type>
+			<location>C:/Users/Aluno/workspace/tp1-coletor-ri/bibliotecas</location>
+		</link>
+	</linkedResources>
 </projectDescription>
