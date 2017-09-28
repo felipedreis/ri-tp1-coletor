@@ -63,7 +63,7 @@ public class RobotExclusion {
 			// TODO: this should support error conditions as described in the protocol draft
 			// TODO: use some kind of caching
 			URL robotsUrl = new URL(url, ROBOTS_TXT);
-			//URL robotsUrl = new URL("http://www2.dcc.ufmg.br/projetos/greenwiki/teste.txt");
+			//URL robotsUrl = new URL("/");
 			//System.out.println("Robots na url: "+robotsUrl.toString());
 			 BufferedReader in = new BufferedReader(
 				        new InputStreamReader(robotsUrl.openStream()));

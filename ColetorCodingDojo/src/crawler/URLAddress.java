@@ -1,9 +1,14 @@
 package crawler;
 
+import com.trigonic.jrobotx.Record;
+import com.trigonic.jrobotx.RobotExclusion;
+
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public class URLAddress {
 	private URL address;
@@ -61,19 +66,37 @@ public class URLAddress {
 		System.out.println("Dominio: "+url2.getDomain());
 		System.out.println("Caminho: "+url2.getPath());
 		System.out.println("Completo: "+url2.getAddress());
-		
-		URL url = new URL("http://www.terra.com.br");
+
+
+		URL url = new URL("http://esportes.terra.com.br");
 		System.out.println(url.getHost());
 		InetAddress address = InetAddress.getByName(url.getHost());
 		System.out.println(address.getHostAddress());
-		
-		url = new URL("http://esportes.terra.com.br");
+
+		url = new URL("http://www.terra.com.br");
 		System.out.println(url.getHost());
 		address = InetAddress.getByName(url.getHost());
 		System.out.println(address.getHostAddress());
+
+
+		RobotExclusion r = new RobotExclusion();
+		Iterator it = r.get(url);
+		while (it.hasNext()) {
+
+			Record record = (Record) it.next();
+			System.out.println(record.allows("/cgi-bin/"));
+
+			for (String [] in : record.getRules()) {
+				Arrays.stream(in).forEach(System.out::println);
+			}
+		}
 	}
 	public String toString()
 	{
 		return address.toString();
+	}
+
+	public URL toJavaURL() throws MalformedURLException {
+		return new URL(this.getAddress());
 	}
 }

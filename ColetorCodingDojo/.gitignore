@@ -1,0 +1,6 @@
+*.class
+*.xml
+*.html
+*.iml
+.idea
+.settings
