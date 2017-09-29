@@ -1,9 +1,14 @@
 package crawler;
 
-import javax.print.attribute.standard.MediaSize.Other;
+import java.util.Comparator;
 
 public class Servidor {
-	public static final long ACESSO_MILIS = 30*1000;
+	public static final Comparator<Servidor> comparator = (s1, s2) -> {
+		return s1.getLastAcess() < s2.getLastAcess()? -1 : 1;
+
+	};
+
+	public static final long ACESSO_MILIS = 1000 ;
 	
 	
 	private String nome;
@@ -39,6 +44,7 @@ public class Servidor {
 	 */
 	public synchronized boolean isAccessible()
 	{
+		System.out.println(getTimeSinceLastAcess());
 		return getTimeSinceLastAcess() > ACESSO_MILIS;
 	}
 	
@@ -63,11 +69,7 @@ public class Servidor {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Servidor other = null; 
-		if (obj instanceof String)
-			other = new Servidor((String)obj);
-		else
-			other = (Servidor) obj;
+		Servidor other = (Servidor) obj;
 		if (nome == null) {
 			if (other.nome != null)
 				return false;

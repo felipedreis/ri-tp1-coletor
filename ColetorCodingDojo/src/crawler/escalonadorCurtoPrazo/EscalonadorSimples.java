@@ -37,91 +37,85 @@ public class EscalonadorSimples implements Escalonador{
 	public EscalonadorSimples(){
 		fila = new LinkedHashMap<>();
 		pagVisitadas = new HashSet<>();
-		servidores = new PriorityQueue<>();
+		servidores = new PriorityQueue<>(Servidor.comparator);
 		mapaRobots = new HashMap<>();
 		cont_paginas = 0;
 	}
-	
-	
+
 	@Override
 	public synchronized URLAddress getURL() {
-		boolean isAcessivel = true;
-		do{
-			if(!servidores.isEmpty()){
-				for (Servidor servidor : servidores){
-					if(!servidor.isAccessible()){
-						isAcessivel = false;
-					}else{
-						if(!fila.get(servidor).isEmpty()){
-							URLAddress url = fila.get(servidor).remove(0);
-							servidor.acessadoAgora();
-							this.notifyAll();
-							servidores.add(servidor);
-							return url;
-						}else{
-							servidores.remove(servidor);
-						}
+		URLAddress url = null;
+
+		while (url == null) {
+			Servidor servidor = getProximoServidorAcessivel();
+
+			if (fila.get(servidor).isEmpty()) {
+				servidor.acessadoAgora();
+				servidores.offer(servidor);
+				System.out.println("No link found to server " + servidor.getNome());
+			} else {
+				url = fila.get(servidor).remove(0);
+				servidor.acessadoAgora();
+				servidores.add(servidor);
+			}
+		}
+		return url;
+	}
+
+
+	private synchronized Servidor getProximoServidorAcessivel() {
+		boolean isAcessivel;
+		Servidor servidor = null;
+		try {
+			while(servidores.isEmpty() && !finalizouColeta()) {
+				System.out.println("Esperando um novo servidor");
+				wait(1000);
+			}
+
+			Iterator<Servidor> it = servidores.iterator();
+			isAcessivel = false;
+			while (!isAcessivel) {
+				for (int i = 0; i < servidores.size(); ++i) {//while (servidores.isEmpty()) {
+					servidor = servidores.remove();
+
+					if (servidor.isAccessible()) {
+						isAcessivel = true;
+						break;
+					} else {
+						servidores.offer(servidor);
 					}
 				}
-				if(!isAcessivel){
-					try{
-						this.wait(1000);
-					}catch(InterruptedException e){
-						e.printStackTrace();
-					}
+				if(!isAcessivel) {
+					System.out.println("Esperando um servidor ficar acessivel");
+					wait(1000);
 				}
 			}
-		} while(!this.finalizouColeta());
-		return null;
+
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
+
+		return servidor;
 	}
-	
-	/*
-	@Override
-	public synchronized URLAddress getURL() {
-		do{
-			if(!servidores.isEmpty()){
-				Servidor servidor = servidores.remove();
-				if(!servidor.isAccessible()){
-					servidores.add(servidor);
-					try{
-						this.wait(1000);
-					}catch(InterruptedException e){
-						e.printStackTrace();
-					}
-					continue;
-				}else{
-					if(!fila.get(servidor).isEmpty()){
-						URLAddress url = fila.get(servidor).remove(0);
-						servidor.acessadoAgora();
-						this.notifyAll();
-						servidores.add(servidor);
-						return url;
-					}else{
-						servidores.add(servidor);
-					}
-				}
-			}
-		} while(!this.finalizouColeta());
-		return null;
-	}
-	 * */
 
 	@Override
 	public synchronized boolean adicionaNovaPagina(URLAddress urlAdd) {
 
 		if(!pagVisitadas.contains(urlAdd) && urlAdd.getDepth() < DEPTH_LIMIT){
 			Servidor servidor = new Servidor(urlAdd.getDomain());
+			List<URLAddress> lista;
+
 			if(!fila.containsKey(servidor)){
-				List<URLAddress> lista = new LinkedList<URLAddress>();
+				lista = new LinkedList<>();
 				lista.add(urlAdd);
 				fila.put(servidor, lista);
 				servidores.add(servidor);
 			}else{
-				List<URLAddress> lista = new LinkedList<URLAddress>();
+				lista = fila.get(servidor);
 				lista.add(urlAdd);
-				fila.get(urlAdd.getDomain()).add(urlAdd);
 			}
 			pagVisitadas.add(urlAdd);
+			notifyAll();
 			return true;
 		}
 		return false;

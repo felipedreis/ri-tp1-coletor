@@ -99,4 +99,20 @@ public class URLAddress {
 	public URL toJavaURL() throws MalformedURLException {
 		return new URL(this.getAddress());
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof URLAddress)) return false;
+
+		URLAddress that = (URLAddress) o;
+
+		return address.equals(that.address);
+
+	}
+
+	@Override
+	public int hashCode() {
+		return address.hashCode();
+	}
 }

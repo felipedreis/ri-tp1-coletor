@@ -1,14 +1,17 @@
 package crawler;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.stream.Collectors;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
@@ -22,7 +25,6 @@ public class ColetorUtil {
 	 */
 	public static InputStream getUrlStream(String userAgent,URL url) throws IOException
 	{
-
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestProperty("User-Agent",userAgent);
 		return conn.getInputStream();
