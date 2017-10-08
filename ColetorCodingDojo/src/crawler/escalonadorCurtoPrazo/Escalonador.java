@@ -4,6 +4,8 @@ import com.trigonic.jrobotx.Record;
 
 import crawler.URLAddress;
 
+import java.util.Set;
+
 public interface Escalonador {
 	
 	/**

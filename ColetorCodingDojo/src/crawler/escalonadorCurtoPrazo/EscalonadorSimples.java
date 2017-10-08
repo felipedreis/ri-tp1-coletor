@@ -1,10 +1,5 @@
 package crawler.escalonadorCurtoPrazo;
 
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +12,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.trigonic.jrobotx.Record;
-import com.trigonic.jrobotx.RobotExclusion;
 
 import crawler.Servidor;
 import crawler.URLAddress;
@@ -31,15 +25,20 @@ public class EscalonadorSimples implements Escalonador{
 	private Queue<Servidor> servidores;
 	private Map<String, Record> mapaRobots;
 	private int cont_paginas;
-	private final int limite_paginas = 10;
-	
-	
+	private final int limitePaginas;
+
 	public EscalonadorSimples(){
+		this(10);
+	}
+	
+	
+	public EscalonadorSimples(int limitePaginas){
 		fila = new LinkedHashMap<>();
 		pagVisitadas = new HashSet<>();
 		servidores = new PriorityQueue<>(Servidor.comparator);
 		mapaRobots = new HashMap<>();
 		cont_paginas = 0;
+		this.limitePaginas = limitePaginas;
 	}
 
 	@Override
@@ -139,7 +138,7 @@ public class EscalonadorSimples implements Escalonador{
 	
 	@Override
 	public synchronized boolean finalizouColeta() {
-		if (cont_paginas >= limite_paginas)
+		if (cont_paginas >= limitePaginas)
 			return true;
 		return false;
 	}
@@ -149,5 +148,4 @@ public class EscalonadorSimples implements Escalonador{
 		cont_paginas++;
 	}
 
-	
 }

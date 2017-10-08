@@ -13,10 +13,9 @@ import java.util.Iterator;
 public class URLAddress {
 	private URL address;
 	private int depth;
-	public URLAddress(String url,int depth) throws MalformedURLException
-	{
-		
-		this.address =  new URL(formatURL(url));
+	public URLAddress(String url,int depth) throws MalformedURLException  {
+
+		this.address = new URL(formatURL(url));
 		this.depth = depth;
 	}
 	public static String formatURL(String url)
@@ -113,6 +112,6 @@ public class URLAddress {
 
 	@Override
 	public int hashCode() {
-		return address.hashCode();
+		return address.toString().hashCode();
 	}
 }

@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by felipe on 27/09/17.
@@ -20,21 +22,35 @@ public class PageFetcher implements Runnable{
 
     private Escalonador escalonador;
 
+    private Set<URLAddress> collectedPages;
+
     public PageFetcher(Escalonador escalonador) {
         this.escalonador = escalonador;
+        collectedPages = new HashSet<>();
     }
 
     @Override
     public void run() {
-        URLAddress url = escalonador.getURL();
-        System.out.println("Got url " + url.getAddress());
+        URLAddress url;
+
+        while(!escalonador.finalizouColeta()) {
+            url = escalonador.getURL();
+            collect(url);
+        }
+    }
+
+    public Set<URLAddress> getCollectedPages() {
+        return collectedPages;
+    }
+
+    private void collect(URLAddress url) {
         boolean noIndex = false, noFollow = false;
         try {
             Record robots = getRobots(url);
 
-            if (robots != null || robots.allows(url.getPath())) {
+            if (robots == null || robots.allows(url.getPath())) {
                 InputStream urlStream;
-                urlStream = ColetorUtil.getUrlStream(Constants.USER_AGENT, url.toJavaURL());
+                urlStream = ColetorUtil.getUrlStream(Constants.USER_AGENT_NAME, url.toJavaURL());
                 String html = ColetorUtil.consumeStream(urlStream);
 
                 HtmlCleaner cleaner = new HtmlCleaner();
@@ -61,6 +77,7 @@ public class PageFetcher implements Runnable{
                         }
                     }
                     escalonador.countFetchedPage();
+                    collectedPages.add(url);
                 }
             }
         } catch (Exception ex) {
