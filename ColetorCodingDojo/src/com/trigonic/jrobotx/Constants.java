@@ -18,7 +18,7 @@ package com.trigonic.jrobotx;
 
 public final class Constants {
 
-    public static final String USER_AGENT_NAME = "UsainBot";
+    public static final String USER_AGENT_NAME = "Usainbot (sites.google.com/view/aboutusainbot)";
     public static final String ROBOTS_TXT = "/robots.txt";
 
     public static final String USER_AGENT = "User-Agent";
