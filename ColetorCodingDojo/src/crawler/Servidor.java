@@ -44,7 +44,6 @@ public class Servidor {
 	 */
 	public synchronized boolean isAccessible()
 	{
-		System.out.println(getTimeSinceLastAcess());
 		return getTimeSinceLastAcess() > ACESSO_MILIS;
 	}
 	

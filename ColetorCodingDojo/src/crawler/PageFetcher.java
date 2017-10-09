@@ -8,11 +8,14 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,22 +69,37 @@ public class PageFetcher implements Runnable{
 
                 if (!noIndex && !noFollow) {
                     TagNode [] links = node.getElementsByName("a", true);
-
-                    for (TagNode link : links) {
-                        String href = link.getAttributeByName("href");
-                        if(href != null) {
-                            if(href.startsWith("/"))
-                                href = url.getAddress() + href;
-                            URLAddress address = new URLAddress(href, url.getDepth() + 1);
-                            escalonador.adicionaNovaPagina(address);
-                        }
-                    }
+                    processLinkTags(links, url);
                     escalonador.countFetchedPage();
                     collectedPages.add(url);
                 }
             }
+        } catch (UnknownHostException ex) {
+            System.out.println("ERRO");
+        } catch (MalformedURLException ex) {
+            System.out.println("Malformed url " + url);
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println("Couldn\'t consume to url " + url);
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void processLinkTags (TagNode [] links, URLAddress url) {
+        for (TagNode link : links) {
+            String href = link.getAttributeByName("href");
+            if(href != null) {
+                if(href.startsWith("/"))
+                    href = url.getAddress() + href;
+
+                try {
+                    URLAddress address = new URLAddress(href, url.getDepth() + 1);
+                    escalonador.adicionaNovaPagina(address);
+                } catch (MalformedURLException ex) {
+                    System.err.println("Couldn\'t add url " + href);
+                }
+            }
         }
     }
 

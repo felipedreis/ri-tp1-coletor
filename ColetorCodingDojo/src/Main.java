@@ -19,7 +19,7 @@ public class Main {
         int numOfThreads = 1;
         int numPagesToCollect = 100;
 
-        for(int i = 1; i < args.length; ++i) {
+        for(int i = 0; i < args.length; ++i) {
 
             switch (args[i]) {
                 case "-h":
@@ -81,21 +81,26 @@ public class Main {
             for (int i = 0; i < fetcherThreads.length; ++i) {
                 fetchers[i] = new PageFetcher(escalonador);
                 fetcherThreads[i] = new Thread(fetchers[i]);
-                fetcherThreads[i].run();
+                fetcherThreads[i].start();
             }
 
             BufferedWriter output = new BufferedWriter(new FileWriter(outputFileName));
-
+            long collectedPages = 0;
             for (int i = 0; i < fetcherThreads.length; ++i) {
                 fetcherThreads[i].join();
                 for(URLAddress link : fetchers[i].getCollectedPages()) {
-                    output.write(link.toString());
+                    output.write(link.toString() + "\n");
+                    collectedPages++;
                 }
             }
+            output.close();
 
             long endTime = System.currentTimeMillis();
-
-            System.out.println("Elapsed time: " + ((endTime - startTime) * 1000));
+            double elapsedTime = (endTime - startTime) / 1000.0;
+            double pagesPerSec = collectedPages / elapsedTime;
+            System.out.println("Elapsed time: " + elapsedTime + " sec.");
+            System.out.println("Collected pages: " + collectedPages);
+            System.out.println("Pages per sec: " + pagesPerSec);
 
         } catch (IOException ex) {
             ex.printStackTrace();
